@@ -1,0 +1,38 @@
+replicaCount: 4
+
+image:
+  repository: barrype/weather-app-private
+  tag: latest
+  pullPolicy: Always
+  pullSecrets:
+    - dockerhub-secret
+
+imagePullSecrets:
+  - name: dockerhub-secret
+
+configMapName: weather-config-blue #weather-config-red
+
+containerPort: 5000
+
+efs:
+  enabled: true
+  mountPath: /logs/history
+
+persistence:
+  enabled: true
+#  existingClaim: ""
+  storageClassName: efs-sc
+  accessModes:
+    - ReadWriteMany
+  size: 1Gi
+
+service:
+  port: 32300
+  type: ClusterIP
+
+containerPort: 5000
+
+ingress:
+  enabled: true
+  hostname: weather.myapp.local
+  albGroup: my-apps

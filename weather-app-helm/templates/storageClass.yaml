@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-0fd2bb5538abaf5af #TODO: CHANGE TO DYNAMIC FS, HAS TO BE MANUALLY CHANGED EVERY TIME
+  directoryPerms: "750"
+  gidRangeStart: "1000"
+  gidRangeEnd: "2000"
+  basePath: "/dynamic_provisioning"
+volumeBindingMode: Immediate

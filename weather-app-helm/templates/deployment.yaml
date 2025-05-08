@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "weather-app.fullname" . }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        date: "{{ now | unixEpoch }}"
+    spec:
+      initContainers:
+        - name: wait-for-efs
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "Ensuring /logs/history exists..."
+              mkdir -p /logs/history
+              echo "Waiting for /logs/history..."
+              while [ ! -d /logs/history ]; do
+                echo "Not ready, sleeping..."
+                sleep 1
+              done
+          volumeMounts:
+            - name: weather-data
+              mountPath: /logs
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          volumeMounts:
+            - name: weather-data
+              mountPath: {{ .Values.efs.mountPath | default "/logs/history" }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+
+      volumes:
+        - name: weather-data
+          persistentVolumeClaim:
+            claimName: {{ include "weather-app.fullname" . }}-pvc
+
+{{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+{{- end }}
