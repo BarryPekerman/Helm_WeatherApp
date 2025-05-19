@@ -5,7 +5,7 @@ metadata:
 provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
-  fileSystemId: fs-0d7166e48bb2fb5cb #TODO: CHANGE TO DYNAMIC FS, HAS TO BE MANUALLY CHANGED EVERY TIME
+  fileSystemId: {{ (lookup "v1" "ConfigMap" "kube-system" "efs-config").data.fileSystemId }}
   directoryPerms: "750"
   gidRangeStart: "1000"
   gidRangeEnd: "2000"
