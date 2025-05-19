@@ -5,7 +5,7 @@ metadata:
 provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
-  fileSystemId: {{ (lookup "v1" "ConfigMap" "kube-system" "efs-config").data.fileSystemId }}
+  fileSystemId: {{ .Values.fileSystemId | quote }}
   directoryPerms: "750"
   gidRangeStart: "1000"
   gidRangeEnd: "2000"

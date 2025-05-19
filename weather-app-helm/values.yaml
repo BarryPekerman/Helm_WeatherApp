@@ -17,6 +17,7 @@ containerPort: 5000
 efs:
   enabled: true
   mountPath: /logs/history
+  fileSystemId: ""
 
 persistence:
   enabled: true
